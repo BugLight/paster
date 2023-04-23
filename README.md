@@ -1,6 +1,6 @@
 # paster
 
-Easily paste from your terminal to services like Pastebin
+Easily paste from your terminal to services like pastebin.com
 
 ## Features
 
@@ -30,7 +30,7 @@ Paster comes with pastebin.com configured as a default destination. All you
 need to get started is to write your key to the config.
 
 ```bash
-paster --config pastebin.key <your pastebin.com key>
+paster config pastebin.key <your pastebin.com key>
 ```
 
 ### Create paste from stdin
@@ -48,6 +48,6 @@ paster file.txt
 ### Paste to non-default destination
 
 ```bash
-paster --to other example.rs
+paster -d other example.rs
 ```
 
