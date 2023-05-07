@@ -1,6 +1,6 @@
 use std::path::PathBuf;
 
-use anyhow::Result;
+use anyhow::{Context, Result};
 use clap::{Parser, Subcommand};
 
 /// Easily paste from your terminal to services like pastebin.com
@@ -19,22 +19,37 @@ struct Cli {
 
 #[derive(Subcommand)]
 enum Commands {
-    Config {
-        key: String,
-        value: String,
-    },
+    /// Update paster config
+    Config { key: String, value: String },
+}
+
+fn config_command(
+    mut config: paster::config::PasterConfig,
+    key: &str,
+    value: String,
+) -> Result<()> {
+    paster::config::update_config_value(&mut config, &key, value)
+        .with_context(|| "Update config failed")?;
+    confy::store("paster", None, config).with_context(|| "Store config failed")?;
+
+    Ok(())
+}
+
+fn paster_command(
+    _config: paster::config::PasterConfig,
+    _dest: Option<String>,
+    _file: Option<PathBuf>,
+) -> Result<()> {
+    Ok(())
 }
 
 fn main() -> Result<()> {
     let args = Cli::parse();
-    match args.command {
-        Some(Commands::Config { key: _, value: _ }) => {
-            // Update config value
-        },
-        None => {
-            // Actually paste something
-        }
-    }
+    let config: paster::config::PasterConfig =
+        confy::load("paster", None).with_context(|| "Load config failed")?;
 
-    Ok(())
+    match args.command {
+        Some(Commands::Config { key, value }) => config_command(config, &key, value),
+        None => paster_command(config, args.dest, args.file),
+    }
 }

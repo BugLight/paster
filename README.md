@@ -30,7 +30,7 @@ Paster comes with pastebin.com configured as a default destination. All you
 need to get started is to write your key to the config.
 
 ```bash
-paster config pastebin.key <your pastebin.com key>
+paster config dest.pastebin.dev_key <your pastebin.com developer API key>
 ```
 
 ### Create paste from stdin
