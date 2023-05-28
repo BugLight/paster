@@ -7,6 +7,8 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize)]
 pub struct PasterConfig {
+    /// Config format version
+    pub version: String,
     /// Default destination name
     pub default: String,
     /// Different paste destinations
@@ -77,6 +79,7 @@ impl Default for PasterConfig {
         );
 
         PasterConfig {
+            version: String::from("1"),
             default,
             dest: destinations,
         }
