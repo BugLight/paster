@@ -7,8 +7,8 @@ use clap::{Parser, Subcommand};
 use paster::config::PasterConfig;
 use paster::paste::Paste;
 
-/// Easily paste from your terminal to services like pastebin.com
 #[derive(Parser)]
+#[command(author, version, about, long_about = None)]
 struct Cli {
     #[command(subcommand)]
     command: Option<Commands>,
