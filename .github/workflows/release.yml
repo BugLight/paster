@@ -1,0 +1,76 @@
+name: Release
+
+on:
+  push:
+    tags: [ "v*" ]
+
+jobs:
+  create:
+    runs-on: ubuntu-latest
+    outputs:
+      upload_url: ${{ steps.create_release.outputs.upload_url }}
+    steps:
+    - uses: actions/create-release@v1
+      id: create_release
+      name: Create Release
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: Release ${{ github.ref }}
+        draft: false
+        prerelease: false
+
+  build:
+    needs: create
+    strategy:
+      matrix:
+        build:
+        - linux
+        - macos-intel
+        - macos-arm
+        include:
+        - build: linux
+          os: ubuntu-22.04
+          target: x86_64-unknown-linux-musl
+        - build: macos-intel
+          os: macos-12
+          target: x86_64-apple-darwin
+        - build: macos-arm
+          os: macos-12
+          target: aarch64-apple-darwin
+    runs-on: ${{ matrix.os }}
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions-rs/toolchain@v1
+      with:
+        toolchain: stable
+        target: ${{ matrix.target }}
+        override: true
+    - uses: actions-rs/cargo@v1
+      name: Build
+      with:
+        use-cross: true
+        command: build
+        args: --release --target ${{ matrix.target }}
+    - name: Strip release binary
+      run: strip "target/${{ matrix.target }}/release/paster"
+    - name: Build archive
+      shell: bash
+      run: |
+        staging="paster-${{ github.ref }}-${{ matrix.target }}"
+        mkdir -p "$staging"
+
+        cp {README.md,LICENSE} "$staging/"
+        cp "target/${{ matrix.target }}/release/paster" "$staging/"
+        tar czf "$staging.tar.gz" "$staging"
+        echo "ASSET=$staging.tar.gz" >> $GITHUB_ENV
+    - name: Upload archive
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ needs.create.outputs.upload_url }}
+        asset_path: ${{ env.ASSET }}
+        asset_name: ${{ env.ASSET }}
+        asset_content_type: application/octet-stream
