@@ -1,5 +1,7 @@
 # paster
 
+![ci workflow](https://github.com/BugLight/paster/actions/workflows/ci.yml/badge.svg)
+
 Easily paste from your terminal to services like pastebin.com
 
 ## Features
