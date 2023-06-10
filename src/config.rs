@@ -63,9 +63,9 @@ impl GetByKey for DestinationConfig {
     }
 }
 
-impl Into<Box<dyn Paste>> for DestinationConfig {
-    fn into(self) -> Box<dyn Paste> {
-        match self {
+impl From<DestinationConfig> for Box<dyn Paste> {
+    fn from(val: DestinationConfig) -> Self {
+        match val {
             // TODO: There must be some clever way to do it
             DestinationConfig::Pastebin(x) => x.into(),
             DestinationConfig::Debug(x) => x.into(),

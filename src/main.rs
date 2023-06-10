@@ -32,7 +32,7 @@ enum Commands {
 }
 
 fn config_command(mut config: PasterConfig, key: &str, value: String) -> Result<()> {
-    paster::config::update_config_value(&mut config, &key, value)
+    paster::config::update_config_value(&mut config, key, value)
         .with_context(|| "Update config failed")?;
     confy::store("paster", None, config).with_context(|| "Store config failed")?;
 

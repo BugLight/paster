@@ -52,11 +52,11 @@ impl Paste for Pastebin {
     }
 }
 
-impl Into<Box<dyn Paste>> for PastebinConfig {
-    fn into(self) -> Box<dyn Paste> {
+impl From<PastebinConfig> for Box<dyn Paste> {
+    fn from(val: PastebinConfig) -> Self {
         Box::new(Pastebin {
-            dev_key: self.dev_key,
-            user_key: self.user_key,
+            dev_key: val.dev_key,
+            user_key: val.user_key,
             client: Client::new(),
         })
     }

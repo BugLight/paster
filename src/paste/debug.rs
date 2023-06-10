@@ -25,8 +25,8 @@ impl GetByKey for DebugConfig {
     }
 }
 
-impl Into<Box<dyn Paste>> for DebugConfig {
-    fn into(self) -> Box<dyn Paste> {
+impl From<DebugConfig> for Box<dyn Paste> {
+    fn from(_val: DebugConfig) -> Self {
         Box::new(Debug)
     }
 }
