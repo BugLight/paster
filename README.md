@@ -1,6 +1,7 @@
 # paster
 
 ![ci workflow](https://github.com/BugLight/paster/actions/workflows/ci.yml/badge.svg)
+[![crates.io](https://img.shields.io/crates/v/paster.svg)](https://crates.io/crates/paster)
 
 Easily paste from your terminal to services like pastebin.com
 
