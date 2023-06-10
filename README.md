@@ -4,8 +4,8 @@ Easily paste from your terminal to services like pastebin.com
 
 ## Features
 
-- Automatic format detection
-- Multiple paste destinations
+- Automatic format detection (WIP)
+- Multiple paste destinations (WIP)
 - Easy to configure
 
 ## How to install

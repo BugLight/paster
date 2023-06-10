@@ -1,11 +1,11 @@
 use std::collections::HashMap;
 
-use crate::paste::{pastebin, Paste};
+use crate::paste::{debug, pastebin, Paste};
 use anyhow::{Error, Result};
 use either::Either;
 use serde::{Deserialize, Serialize};
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct PasterConfig {
     /// Config format version
     pub version: String,
@@ -15,11 +15,14 @@ pub struct PasterConfig {
     pub dest: HashMap<String, DestinationConfig>,
 }
 
-#[derive(Serialize, Deserialize, Clone)]
+// TODO: Use GetByKey and Into<Box<dyn Paster>> traits without enum somehow
+#[derive(Serialize, Deserialize, Clone, Debug)]
 #[serde(tag = "type")]
 pub enum DestinationConfig {
     /// pastebin.com destination
     Pastebin(pastebin::PastebinConfig),
+    /// debug destination (echoes pasted content)
+    Debug(debug::DebugConfig),
 }
 
 pub trait GetByKey {
@@ -53,7 +56,9 @@ where
 impl GetByKey for DestinationConfig {
     fn get_by_key(&mut self, key: &str) -> Result<Either<&mut String, &mut dyn GetByKey>> {
         match self {
+            // TODO: There must be some clever way to do it
             DestinationConfig::Pastebin(x) => x.get_by_key(key),
+            DestinationConfig::Debug(x) => x.get_by_key(key),
         }
     }
 }
@@ -61,7 +66,9 @@ impl GetByKey for DestinationConfig {
 impl Into<Box<dyn Paste>> for DestinationConfig {
     fn into(self) -> Box<dyn Paste> {
         match self {
+            // TODO: There must be some clever way to do it
             DestinationConfig::Pastebin(x) => x.into(),
+            DestinationConfig::Debug(x) => x.into(),
         }
     }
 }
@@ -129,6 +136,7 @@ mod tests {
             }) => {
                 assert_eq!(dev_key, "test");
             }
+            DestinationConfig::Debug(_) => panic!(),
         }
         Ok(())
     }

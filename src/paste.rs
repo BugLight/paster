@@ -7,4 +7,5 @@ pub trait Paste {
     fn paste(&self, source: Box<dyn Read>) -> Result<String>;
 }
 
+pub mod debug;
 pub mod pastebin;

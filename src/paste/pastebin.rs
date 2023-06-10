@@ -2,12 +2,12 @@ use crate::config::GetByKey;
 
 use super::*;
 
-use anyhow::{Error, Result, Context};
+use anyhow::{Context, Error, Result};
 use either::Either;
 use reqwest::blocking::Client;
 use serde::{Deserialize, Serialize};
 
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct PastebinConfig {
     /// Developer API key
     pub dev_key: String,
@@ -39,7 +39,8 @@ impl Paste for Pastebin {
             .client
             .post("https://pastebin.com/api/api_post.php")
             .multipart(data)
-            .send().with_context(|| "Failed to send request to pastebin.com")?;
+            .send()
+            .with_context(|| "Failed to send request to pastebin.com")?;
         if resp.status().is_success() {
             Ok(resp.text()?)
         } else {

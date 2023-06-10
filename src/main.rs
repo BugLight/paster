@@ -13,7 +13,11 @@ struct Cli {
     #[command(subcommand)]
     command: Option<Commands>,
 
-    /// Paste destination name from config
+    /// Configuration file path
+    #[arg(short, long, value_name = "PATH")]
+    config: Option<PathBuf>,
+
+    /// Paste destination name from config [default: /etc/paster/config.yaml]
     #[arg(short, long, value_name = "DESTINATION")]
     dest: Option<String>,
 
@@ -57,7 +61,11 @@ fn paster_command(config: PasterConfig, dest: Option<String>, file: Option<PathB
 
 fn main() -> Result<()> {
     let args = Cli::parse();
-    let config: PasterConfig = confy::load("paster", None).with_context(|| "Load config failed")?;
+    let config_path = args
+        .config
+        .unwrap_or(PathBuf::from("/etc/paster/config.yaml"));
+    let config: PasterConfig =
+        confy::load_path(config_path).with_context(|| "Load config failed")?;
 
     match args.command {
         Some(Commands::Config { key, value }) => config_command(config, &key, value),
