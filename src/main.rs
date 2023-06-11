@@ -31,10 +31,15 @@ enum Commands {
     Config { key: String, value: String },
 }
 
-fn config_command(mut config: PasterConfig, key: &str, value: String) -> Result<()> {
+fn config_command(
+    mut config: PasterConfig,
+    config_path: &PathBuf,
+    key: &str,
+    value: String,
+) -> Result<()> {
     paster::config::update_config_value(&mut config, key, value)
         .with_context(|| "Update config failed")?;
-    confy::store("paster", None, config).with_context(|| "Store config failed")?;
+    confy::store_path(config_path, config).with_context(|| "Store config failed")?;
 
     Ok(())
 }
@@ -65,10 +70,10 @@ fn main() -> Result<()> {
         .config
         .unwrap_or(PathBuf::from("/etc/paster/config.yaml"));
     let config: PasterConfig =
-        confy::load_path(config_path).with_context(|| "Load config failed")?;
+        confy::load_path(config_path.clone()).with_context(|| "Load config failed")?;
 
     match args.command {
-        Some(Commands::Config { key, value }) => config_command(config, &key, value),
+        Some(Commands::Config { key, value }) => config_command(config, &config_path, &key, value),
         None => paster_command(config, args.dest, args.file),
     }
 }

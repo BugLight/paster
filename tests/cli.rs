@@ -72,3 +72,17 @@ fn test_unknown_dest() -> Result<()> {
 
     Ok(())
 }
+
+#[test]
+fn test_config_update() -> Result<()> {
+    let config_file = create_test_config()?;
+    let mut cmd = create_test_cmd(&config_file)?;
+
+    cmd.args(["config", "default", "modified"])
+        .assert()
+        .success();
+
+    config_file.assert(contains("default: modified"));
+
+    Ok(())
+}
