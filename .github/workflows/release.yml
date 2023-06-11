@@ -9,7 +9,11 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       upload_url: ${{ steps.create_release.outputs.upload_url }}
+      version: ${{ steps.version.outputs.tag }}
     steps:
+    - name: Version
+      id: version
+      run: echo "tag=${GITHUB_REF#refs/*/}" >> $GITHUB_OUTPUT
     - uses: actions/create-release@v1
       id: create_release
       name: Create Release
@@ -17,7 +21,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         tag_name: ${{ github.ref }}
-        release_name: Release ${{ github.ref }}
+        release_name: Release ${{ steps.version.outputs.tag }}
         draft: false
         prerelease: false
 
@@ -58,7 +62,7 @@ jobs:
     - name: Build archive
       shell: bash
       run: |
-        staging="paster-${{ github.ref }}-${{ matrix.target }}"
+        staging="paster-${{ needs.create.outputs.version }}-${{ matrix.target }}"
         mkdir -p "$staging"
 
         cp {README.md,LICENSE} "$staging/"
