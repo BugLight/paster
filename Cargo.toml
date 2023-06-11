@@ -1,6 +1,6 @@
 [package]
 name = "paster"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["Daniil Zhukov <dmzhukov@outlook.com>"]
 edition = "2021"
 description = "Easily paste from your terminal to services like pastebin.com"

@@ -1,5 +1,5 @@
 class Paster < Formula
-  version "0.1.0"
+  version "0.1.1"
   desc "Easily paste from your terminal to services like Pastebin"
   homepage "https://github.com/BugLight/paster"
   license "MIT"
