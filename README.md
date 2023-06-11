@@ -16,6 +16,7 @@ Easily paste from your terminal to services like pastebin.com
 ### Homebrew
 
 ```bash
+brew tap BugLight/paster https://github.com/BugLight/paster
 brew install paster
 ```
 
