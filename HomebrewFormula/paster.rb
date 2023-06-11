@@ -7,18 +7,18 @@ class Paster < Formula
   on_macos do
     on_intel do
       url "https://github.com/BugLight/paster/releases/download/v#{version}/paster-v#{version}-x86_64-apple-darwin.tar.gz"
-      sha256 "05b3f584d6f51cbef7052a3b4c314a7007e8a8d63315f20f1a92cccdedbd6181"
+      sha256 "ad21ced0357c26b3d1410698785608f1c0a463e067cb3cc36264c913963b500a"
     end
 
     on_arm do
       url "https://github.com/BugLight/paster/releases/download/v#{version}/paster-v#{version}-aarch64-apple-darwin.tar.gz"
-      sha256 "d1a2ce9cb089c5582389a5067de52908acd31166558bd2068ecafb76354e9290"
+      sha256 "4e01175c5a4b4f1c7cae94933d9c960de0d7b5274ff902adb1ded734a8104cee"
     end
   end
 
   on_linux do
     url "https://github.com/BugLight/paster/releases/download/v#{version}/paster-v#{version}-x86_64-unknown-linux-musl.tar.gz"
-    sha256 "8d4bc88891ecd9643cbd4c4d78edae2c8a25aa4bafdca8fd2b5447624a523223"
+    sha256 "78561ae0760ae4f1f4eecbdfc0a9b2189a6eb565053872fa2e0ede21da025290"
   end
 
   def install
