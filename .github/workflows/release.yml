@@ -74,3 +74,18 @@ jobs:
         asset_path: ${{ env.ASSET }}
         asset_name: ${{ env.ASSET }}
         asset_content_type: application/octet-stream
+
+  publish-crate:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions-rs/toolchain@v1
+      with:
+        toolchain: stable
+        override: true
+    - uses: actions-rs/cargo@v1
+      name: Publish to crates.io
+      with:
+        command: publish
+        args: --token ${{ secrets.CRATES_TOKEN }}
+
