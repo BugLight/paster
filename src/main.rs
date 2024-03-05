@@ -31,12 +31,8 @@ enum Commands {
     Config { key: String, value: String },
 }
 
-fn config_command(
-    mut config: PasterConfig,
-    config_path: &PathBuf,
-    key: &str,
-    value: String,
-) -> Result<()> {
+fn config_command(config_path: &PathBuf, key: &str, value: String) -> Result<()> {
+    let mut config: serde_yaml::Value = serde_yaml::from_reader(File::open(config_path)?)?;
     paster::config::update_config_value(&mut config, key, value)
         .with_context(|| "Update config failed")?;
     confy::store_path(config_path, config).with_context(|| "Store config failed")?;
@@ -53,27 +49,30 @@ fn paster_command(config: PasterConfig, dest: Option<String>, file: Option<PathB
 
     let reader = BufReader::new(input);
 
-    match config.dest.get(&dest) {
-        None => Err(Error::msg("Unknown destination name")),
-        Some(destination) => {
-            let paste: Box<dyn Paste> = destination.clone().into();
-            let url = paste.paste(Box::new(reader))?;
-            println!("{}", url);
-            Ok(())
-        }
+    if let Some(destination) = config.dest.get(&dest) {
+        let paste: Box<dyn Paste> = destination.clone().into();
+        let url = paste.paste(Box::new(reader))?;
+        println!("{}", url);
+        Ok(())
+    } else {
+        Err(Error::msg("Unknown destination name"))
     }
 }
 
 fn main() -> Result<()> {
+    // 1. Parse CLI arguments.
     let args = Cli::parse();
+
+    // 2. Load config (new config with defaults is created if none exists).
     let config_path = args
         .config
         .unwrap_or(PathBuf::from("/etc/paster/config.yaml"));
     let config: PasterConfig =
         confy::load_path(config_path.clone()).with_context(|| "Load config failed")?;
 
+    // 3. Execute CLI command.
     match args.command {
-        Some(Commands::Config { key, value }) => config_command(config, &config_path, &key, value),
+        Some(Commands::Config { key, value }) => config_command(&config_path, &key, value),
         None => paster_command(config, args.dest, args.file),
     }
 }

@@ -1,9 +1,5 @@
-use crate::config::GetByKey;
-
 use super::*;
 
-use anyhow::Error;
-use either::Either;
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
@@ -16,12 +12,6 @@ impl Paste for Debug {
         let mut text = String::new();
         source.read_to_string(&mut text)?;
         Ok(text)
-    }
-}
-
-impl GetByKey for DebugConfig {
-    fn get_by_key(&mut self, _key: &str) -> Result<Either<&mut String, &mut dyn GetByKey>> {
-        Err(Error::msg(""))
     }
 }
 

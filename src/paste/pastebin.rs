@@ -1,9 +1,6 @@
-use crate::config::GetByKey;
-
 use super::*;
 
 use anyhow::{Context, Error, Result};
-use either::Either;
 use reqwest::blocking::Client;
 use serde::{Deserialize, Serialize};
 
@@ -59,17 +56,5 @@ impl From<PastebinConfig> for Box<dyn Paste> {
             user_key: val.user_key,
             client: Client::new(),
         })
-    }
-}
-
-impl GetByKey for PastebinConfig {
-    fn get_by_key(&mut self, key: &str) -> Result<Either<&mut String, &mut dyn GetByKey>> {
-        if key == "dev_key" {
-            Ok(Either::Left(&mut self.dev_key))
-        } else if key == "user_key" {
-            Ok(Either::Left(self.user_key.get_or_insert(String::from(""))))
-        } else {
-            Err(Error::msg("Key not found"))
-        }
     }
 }
