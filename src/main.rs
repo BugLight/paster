@@ -31,8 +31,13 @@ enum Commands {
     Config { key: String, value: String },
 }
 
-fn config_command(config_path: &PathBuf, key: &str, value: String) -> Result<()> {
-    let mut config: serde_yaml::Value = serde_yaml::from_reader(File::open(config_path)?)?;
+fn config_command(
+    config: PasterConfig,
+    config_path: &PathBuf,
+    key: &str,
+    value: String,
+) -> Result<()> {
+    let mut config = serde_yaml::to_value(config)?;
     paster::config::update_config_value(&mut config, key, value)
         .with_context(|| "Update config failed")?;
     confy::store_path(config_path, config).with_context(|| "Store config failed")?;
@@ -72,7 +77,7 @@ fn main() -> Result<()> {
 
     // 3. Execute CLI command.
     match args.command {
-        Some(Commands::Config { key, value }) => config_command(&config_path, &key, value),
+        Some(Commands::Config { key, value }) => config_command(config, &config_path, &key, value),
         None => paster_command(config, args.dest, args.file),
     }
 }
