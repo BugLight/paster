@@ -5,7 +5,7 @@ use std::path::PathBuf;
 use anyhow::{Context, Error, Result};
 use clap::{Parser, Subcommand};
 use paster::config::PasterConfig;
-use paster::paste::Paste;
+use paster::paste::{PasteDestination, PasteBuffer};
 
 #[derive(Parser)]
 #[command(author, version, about, long_about = None)]
@@ -46,18 +46,20 @@ fn config_command(
 }
 
 fn paster_command(config: PasterConfig, dest: Option<String>, file: Option<PathBuf>) -> Result<()> {
-    let dest = dest.unwrap_or(config.default);
     let input: Box<dyn Read> = match file {
         Some(path) => Box::new(File::open(path)?),
         None => Box::new(std::io::stdin().lock()),
     };
 
-    let reader = BufReader::new(input);
+    let mut reader = BufReader::new(input);
+    let mut buf = PasteBuffer::empty();
+    reader.read_to_string(&mut buf.text)?;
 
+    let dest = dest.unwrap_or(config.default);
     if let Some(destination) = config.dest.get(&dest) {
-        let paste: Box<dyn Paste> = destination.clone().into();
-        let url = paste.paste(Box::new(reader))?;
-        println!("{}", url);
+        let paste: Box<dyn PasteDestination> = destination.clone().into();
+        let res  = paste.paste(buf)?;
+        println!("{}", res);
         Ok(())
     } else {
         Err(Error::msg("Unknown destination name"))

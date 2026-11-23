@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use crate::paste::{debug, pastebin, Paste};
+use crate::paste::{debug, pastebin, PasteDestination};
 use anyhow::{Error, Result};
 use serde::{Deserialize, Serialize};
 
@@ -14,7 +14,6 @@ pub struct PasterConfig {
     pub dest: HashMap<String, DestinationConfig>,
 }
 
-// TODO: Use GetByKey and Into<Box<dyn Paster>> traits without enum somehow
 #[derive(Serialize, Deserialize, Clone, Debug)]
 #[serde(tag = "type")]
 pub enum DestinationConfig {
@@ -24,7 +23,7 @@ pub enum DestinationConfig {
     Debug(debug::DebugConfig),
 }
 
-impl From<DestinationConfig> for Box<dyn Paste> {
+impl From<DestinationConfig> for Box<dyn PasteDestination> {
     fn from(val: DestinationConfig) -> Self {
         match val {
             // TODO: There must be some clever way to do it
@@ -40,10 +39,7 @@ impl Default for PasterConfig {
         let mut destinations = HashMap::new();
         destinations.insert(
             default.clone(),
-            DestinationConfig::Pastebin(pastebin::PastebinConfig {
-                dev_key: String::from("<your dev API key>"),
-                user_key: None,
-            }),
+            DestinationConfig::Pastebin(pastebin::PastebinConfig::default()),
         );
 
         PasterConfig {

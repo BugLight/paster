@@ -12,6 +12,7 @@ categories = ["command-line-utilities"]
 
 [dependencies]
 anyhow = "1.0.70"
+arboard = "3.3.2"
 either = "1.8"
 clap = { version = "4.2.4", features = ["derive"] }
 confy = { version = "0.5.1", default-features = false, features = ["yaml_conf"] }

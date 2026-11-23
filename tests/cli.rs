@@ -2,6 +2,7 @@ use anyhow::Result;
 use assert_cmd::Command;
 use assert_fs::prelude::*;
 use assert_fs::NamedTempFile;
+use arboard::Clipboard;
 use paster::{
     config::{DestinationConfig, PasterConfig},
     paste::debug::DebugConfig,
@@ -9,6 +10,7 @@ use paster::{
 use predicates::str::contains;
 
 use std::collections::HashMap;
+
 
 fn create_test_config() -> Result<NamedTempFile> {
     let mut dest = HashMap::new();
@@ -37,10 +39,13 @@ fn test_stdin_paste() -> Result<()> {
     let config_file = create_test_config()?;
     let mut cmd = create_test_cmd(&config_file)?;
 
-    cmd.write_stdin("Test stdin")
+    let test_paste = "Test stdin";
+    cmd.write_stdin(test_paste)
         .assert()
-        .success()
-        .stdout(contains("Test stdin"));
+        .success();
+
+    let mut clipboard = Clipboard::new().unwrap();
+    assert_eq!(test_paste, clipboard.get_text()?);
 
     Ok(())
 }
@@ -51,11 +56,14 @@ fn test_file_paste() -> Result<()> {
     let mut cmd = create_test_cmd(&config_file)?;
 
     let test_file = NamedTempFile::new("test.txt")?;
-    test_file.write_str("Test file")?;
+    let test_paste = "Test file";
+    test_file.write_str(test_paste)?;
     cmd.arg(test_file.to_str().unwrap())
         .assert()
-        .success()
-        .stdout(contains("Test file"));
+        .success();
+
+    let mut clipboard = Clipboard::new().unwrap();
+    assert_eq!(test_paste, clipboard.get_text()?);
 
     Ok(())
 }
